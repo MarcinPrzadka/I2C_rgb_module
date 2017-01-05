@@ -2,10 +2,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-
-
 volatile uint8_t pwm1R, pwm1G, pwm1B, pwm2R, pwm2G, pwm2B,pwm3R, pwm3G, pwm3B, pwm4R, pwm4G, pwm4B;
-
 
 int main(void)
 {
@@ -27,12 +24,22 @@ int main(void)
 	OCR2 = 199;				// dodatkowy podzia³ czêsttotliwoœci przez 200
 	TIMSK |= (1<<OCIE2);	// zezwolenie na przerwanie CompareMatch
 	sei();				// odblokowanie globalne przerwañ
+	unsigned char data;
 
 	while(1)
 	{
-		
+		//data = TWI_read_slave();
+		//if(data == "255") pwm1G = 255;
 		pwm1R=255;
 		pwm2B=255;
+		pwm1B=0;
+		pwm2R=0;
+		_delay_ms(3);
+		pwm1R=0;
+		pwm2B=0;
+		pwm1B=255;
+		pwm2R=255;
+		_delay_ms(3);
 		
 	}
 
@@ -57,6 +64,31 @@ ISR( TIMER2_COMP_vect )
 	cnt++;	
 }
 
+void TWI_init_slave(void) // Function to initilaize slave
+{
+    TWAR=0x20;    // Fill slave address to TWAR
+} 
+
+void TWI_match_read_slave(void) //Function to match the slave address and slave dirction bit(read)
+{
+    while((TWSR & 0xF8)!= 0x60)  // Loop till correct acknoledgement have been received
+    {
+        // Get acknowlegement, Enable TWI, Clear TWI interrupt flag
+        TWCR=(1<<TWEA)|(1<<TWEN)|(1<<TWINT);    
+        while (!(TWCR & (1<<TWINT)));  // Wait for TWINT flag
+    }
+} 
+
+void TWI_read_slave(void)
+{
+	unsigned char recv_data;
+    // Clear TWI interrupt flag,Get acknowlegement, Enable TWI
+    TWCR= (1<<TWINT)|(1<<TWEA)|(1<<TWEN);    
+    while (!(TWCR & (1<<TWINT)));    // Wait for TWINT flag
+    while((TWSR & 0xF8)!=0x80);        // Wait for acknowledgement
+    recv_data=TWDR;                    // Get value from TWDR
+    PORTB=recv_data;                // send the receive value on PORTB
+}
 
 
 
