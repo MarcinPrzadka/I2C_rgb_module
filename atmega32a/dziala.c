@@ -25,6 +25,7 @@ int main(void)
 	TIMSK |= (1<<OCIE2);	// zezwolenie na przerwanie CompareMatch
 	sei();				// odblokowanie globalne przerwañ
 	unsigned char data;
+	TWI_init_slave();
 
 	while(1)
 	{
