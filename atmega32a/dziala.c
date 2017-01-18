@@ -31,6 +31,18 @@ int main(void)
 	{
 		//data = TWI_read_slave();
 		//if(data == "255") pwm1G = 255;
+		//Police();
+		
+		GrenLantern();
+		
+	}
+
+}
+
+// Funkcje swiecace
+
+Police(){
+		LedClean();
 		pwm1R=255;
 		pwm2B=255;
 		pwm1B=0;
@@ -41,13 +53,37 @@ int main(void)
 		pwm1B=255;
 		pwm2R=255;
 		_delay_ms(3);
-		
-	}
+}
+GreenLantern(){
+	
+	LedClean();
+	pwm1G = 255;
+	pwm2G = 255;
+	pwm3G = 255;
+	pwm4G = 255;
 
 }
 
-// cia³o procedury obs³ugi przerwania Compare Match Timera2
-ISR( TIMER2_COMP_vect )
+LedClean(){
+	pwm1R = 0;
+	pwm1B = 0;
+	pwm1G = 0;
+	pwm2R = 0;
+	pwm2B = 0;
+	pwm2G = 0;
+	pwm3R = 0;
+	pwm3B = 0;
+	pwm3G = 0;
+	pwm4R = 0;
+	pwm4B = 0;
+	pwm4G = 0;
+
+}
+
+
+
+
+ISR( TIMER2_COMP_vect ) // cia³o procedury obs³ugi przerwania Compare Match Timera2
 {
 	static uint8_t cnt; 
 	if(cnt>=pwm1R) PORTD |= (1<<PD0); else PORTD &= ~(1<<PD0);
